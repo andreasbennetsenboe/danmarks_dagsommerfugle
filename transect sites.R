@@ -2,6 +2,7 @@ library("sf")
 library("terra")
 library(tidyverse)
 library(showtext)
+library(viridis)
 
 denmark <- readRDS(file= "DNK.rds")
 denmark <- unwrap(denmark)
@@ -36,10 +37,12 @@ data1 <- data.raw %>%
   mutate(date = dmy(date)) %>%
   mutate(year = year(date),
          month = month(date),
-         day = day(date)) %>%
+         day = day(date)) 
+
+data2 <- data1 %>%
   filter(year == 2024 & month == 5) %>%
   group_by(Transect.ID) %>%
-  summarize(count=sum(count)) %>%
+  summarize(count=n_distinct(Transect.Sample.ID)) %>%
   full_join(y = sites, by = "Transect.ID") %>%
   drop_na()
 
@@ -52,30 +55,40 @@ font_add_google(name = "Amatic SC", family = "amatic-sc")
 showtext.auto()
 
 ggplot()+
-  geom_sf(data =  denmark.union, fill = "#f5f5f5", col = "snow3", lwd = 0.2, alpha=0.8)+
+  geom_sf(data =  denmark.union, fill = "#f5f5f5", col = "#757575", lwd = 0.2, alpha=0.8)+
   geom_sf(data =  fau.dist, fill = NA, col = "snow4", lwd = 0.2, alpha=0.8)+
   geom_sf_text(data = fau.dist, 
                aes(label = names), 
                color = "black",
                family = "amatic-sc", 
                fontface = "bold",
-               size = 5,
+               size = 20,
                fun.geometry = st_centroid)+
-  geom_point(data = data1,
+  geom_point(data = data2,
              mapping = aes(x = E, y= N, fill = count),
-             size = 3,
+             size = 2,
              shape = 21
              )+
-  scale_fill_gradient(  low = "white",
-                         high = "#63769E")+
+  scale_fill_viridis(
+    option = "A"
+  )+
   theme_classic() +
-  labs(x = "", y="") +
+  labs(x = "", y="")+
+  ggtitle("Antal ture pr. transekt")+
   theme(
     axis.text = element_blank(),
     axis.line = element_blank(),
     axis.ticks = element_blank(),
-    legend.title = element_blank()
+    plot.title = element_text(size = 100,
+                              hjust = 0.5),
+    legend.title = element_blank(),
+    text = element_text(size = 60,
+                               family = "amatic-sc", 
+                               face = "bold")
   )
+  
+
+ggsave("maj_kort.jpg")
 
 #geom_point(aes(col = "red"))+
 #geom_sf(data = data.15min, 
