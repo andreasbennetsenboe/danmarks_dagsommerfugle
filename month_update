@@ -112,15 +112,45 @@ data2 <- data %>%
 
 #showtext.auto()
 
-ggplot(data = data2, mapping = aes(x = count, y = reorder(species.dk, +count)))+
+month_plot <- function(data, month) {
+  
+ggplot(data = data, mapping = aes(y = count, x = reorder(dk.species, +count)))+
   geom_bar(stat = "identity",
            fill = "#869EC2",
-           col = "#495B73")+
-  theme_minimal()+
+           width = 0.6,
+           col = "#495B73"
+           )+
+  geom_text(aes(label = paste0(after_stat(y))),
+            hjust=-0.5,
+            position = position_dodge(width = 1),
+            size = 30,
+            family = "amatic-sc", 
+            fontface = "bold"
+  )+
+  coord_flip()+
+  theme_minimal(
+    )+
+  labs(x = "",
+       y = "",
+       title = paste0("Observationer i ", month),
+       subtitle = c(paste0("Antal observationer: ", sum(data2$count)), 
+                    paste0("Antal transektture: ", n_distinct(data$Transect.Sample.ID)))
+       )+
+  scale_y_continuous(limits = c(0,150))+
   theme(
     text = element_text(family = "amatic-sc", face = "bold"),
-    axis.text = element_text(size = 15)
-  )+
-  xlab(" ")+
-  ylab(" ")
+    plot.title = element_text(size = 100,
+                              hjust = 0.5,
+                              margin=margin(15,0,25,0)),
+    plot.subtitle = element_text(hjust = c(0.8, 0.2),
+                                 size = 60),
+    axis.text.x = element_blank(),
+    axis.text.y = element_text(size = 80),
+    panel.grid = element_blank()
+  )
 
+}  
+
+month_plot(data = data2, month = "april")
+
+ggsave("april.jpg")
