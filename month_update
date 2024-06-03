@@ -1,0 +1,126 @@
+library(tidyverse)
+library(lubridate)
+library(showtext)
+
+mutate.dk <- function (x){
+  x %>% mutate(species.dk = case_when(
+    species == "Vanessa atalanta" ~ "Admiral",
+    species == "Polyommatus icarus" ~ "Alm. Blåfugl",
+    species == "Plebejus argus" ~ "Argusblåfugl",
+    species == "Anthocharis cardamines" ~ "Aurora",
+    species == "Favonius quercus" ~ "Blåhale",
+    species == "Melithaea athalia" ~ "Brun Pletvinge",
+    species == "Boloria selene" ~ "Brunlig Perlemorsommerfugl",
+    species == "Agriades optilete" ~ "Bølleblåfugl",
+    species == "Gonepteryx rhamni" ~ "Citronsommerfugl",
+    species == "Aglais io" ~ "Dagpåfugleøje",
+    species == "Polygonia c-album" ~ "Det Hvide C",
+    species == "Satyrium w-album" ~ "Det Hvide W",
+    species == "Lycaena virgaureae" ~ "Dukatsommerfugl",
+    species == "Cupido minimus" ~ "Dværgblåfugl",
+    species == "Cyaniris semiargus" ~ "Engblåfugl",
+    species == "Brenthis ino" ~ "Engperlemorsommerfugl",
+    species == "Aphanthopus hyperantus" ~ "Engrandøje",
+    species == "Phengaris alcon" ~ "Ensianblåfugl",
+    species == "Plebejus idas" ~ "Foranderlig Blåfugl",
+    species == "Pyrgus armoricanus" ~ "Fransk Bredpande",
+    species == "Erynnis tages" ~ "Gråbåndet Bredpande",
+    species == "Maniola juthina" ~ "Græsrandøje",
+    species == "Callophrys rubi" ~ "Grøn Busksommerfugl",
+    species == "Pontia edusa" ~ "Grønbroget Kålsommerfugl",
+    species == "Pieris napi" ~ "Grønåret Kålsommerfugl",
+    species == "Colias hyale" ~ "Gul Høsommerfugl",
+    species == "Thecla betulae" ~ "Guldhale",
+    species == "Euphydryas aurinia" ~ "Hedepletvinge",
+    species == "Limenitis camilla" ~ "Hvid Admiral",
+    species == "Apatura ilia" ~ "Ilia",
+    species == "Apatura iris" ~ "Iris",
+    species == "Polyommatus amandus" ~ "Islåfugl",
+    species == "Argynnis paphia" ~ "Kejserkåbe",
+    species == "Nymphalis polychloros" ~ "Kirsebærtakvinge",
+    species == "Fabriciana niobe" ~ "Klitperlemorsommerfugl",
+    species == "Hesperia comma" ~ "Kommabredpande",
+    species == "Lycaena phlaeas" ~ "Lille Ildfugl",
+    species == "Pieris rapae" ~ "Lile Kålsommerfugl",
+    species == "Speyeria aglaja" ~ "Markperlemorsommerfugl",
+    species == "Boloria aquilonaris" ~ "Moseperlemorsommerfugl",
+    species == "Coenonympha tullia" ~ "Moserandøje",
+    species == "Melitaea diamina" ~ "Mørk Pletvinge",
+    species == "Aglais urticae" ~ "Nældens Takvinge",
+    species == "Araschnia levana" ~ "Nældesommerfugl",
+    species == "Melitaea cinxia" ~ "Okkergul Pletvinge",
+    species == "Coenonympha pamphilus" ~ "Okkergul Randøje",
+    species == "Colias croceus" ~ "Orange Høsommerfugl",
+    species == "Boloria euphrosyne" ~ "Rødlig Perlemorsommerfugl",
+    species == "Aricia agestis" ~ "Rødplettet Blåfugl",
+    species == "Hipparchia semele" ~ "Sandrandøje",
+    species == "Celastrina argiolus" ~ "Skovblåfugl",
+    species == "Fabriciana adippe" ~ "Skovperlemorsommerfugl",
+    species == "Pararge aegeria" ~ "Skovrandøje",
+    species == "Thymelicus sylvestris" ~ "Skråstregbredpande",
+    species == "Lycaena tityrus" ~ "Sort Ildfugl",
+    species == "Aricia artaxerxes" ~ "Sortbrun Blåfugl",
+    species == "Phengaris arion" ~ "Sortplettet Blåfugl",
+    species == "Carterocephalus silvicola" ~ "Sortplettet Bredpande",
+    species == "Aporia crataegi" ~ "Sortåret Hvidvinge",
+    species == "Heteropterus morpheus" ~ "Spejlbredpande",
+    species == "Pyrgus malvae" ~ "Spættet Bredpande",
+    species == "Ochlodes sylvanus" ~ "Stor Bredpande",
+    species == "Pieris brassicae" ~ "Stor Kålsommerfugl",
+    species == "Isoria lathonia" ~ "Storplettet Perlemorsommerfugl",
+    species == "Thymelicus lineola" ~ "Stregbredpande",
+    species == "Papilio machaon" ~ "Svalehale",
+    species == "Nymphalis antiopa" ~ "Sørgekåbe",
+    species == "Vanessa cardui" ~ "Tidselsommerfugl",
+    species == "Lasiommata megera" ~ "Vejrandøje",
+    species == "Lycaena hippothoe" ~ "Violetrandet Ildfugl",
+    species == "Nymphalis xanthomelas" ~ "Østlig Takvinge"
+  ))
+}
+
+data.raw <- read.csv(file = "occurences.csv")
+
+species.inspect <- data.raw %>%
+  filter(Preferred.Species.Name == "Erynnis tages")
+
+data <- data.raw %>%
+  dplyr::select(1:3, count = Abundance.Count, date = "Date", species = "Preferred.Species.Name")%>%
+  filter(species %in% c("Aglais io","Gonepteryx rhamni","Anthocharis cardamines","Pieris napi","Pieris rapae",
+                        "Coenonympha pamphilus","Aglais urticae","Lycaena phlaeas","Celastrina argiolus",
+                        "Polyommatus icarus","Aricia agestis","Pieris brassicae","Araschnia levana","Cupido minimus",
+                        "Ochlodes sylvanus","Maniola jurtina","Melitaea cinxia","Boloria selene","Aporia crataegi",
+                        "Melitaea athalia","Issoria lathonia","Lycaena hippothoe","Callophrys rubi","Vanessa atalanta",
+                        "Fabriciana niobe","Cyaniris semiargus","Pararge aegeria","Thymelicus sylvestris",
+                        "Thymelicus lineola","Satyrinae","Thymelicus","Vanessa cardui","Erynnis tages","Pyrgus malvae",
+                        "Fabriciana adippe","Plebejus idas","Lycaena virgaureae","Favonius quercus","Satyrium w-album",
+                        "Argynnis","Hesperiidae","Argynnis paphia","Thecla betulae","Nymphalis antiopa","Lasiommata megera",
+                        "Sympetrum sanguineum","Colias hyale","Lycaenidae"
+                        )) %>%
+  mutate(date = dmy(date)) %>%
+  mutate(year = year(date),
+         month = month(date),
+         day = day(date)) %>%
+  filter(year == 2024 & month == 5) %>%
+  mutate.dk()
+
+data2 <- data %>%
+  group_by(species.dk) %>%
+  summarise(count = sum(count)) %>%
+  arrange(desc(count))
+
+#font_add_google(name = "Amatic SC", family = "amatic-sc")
+
+#showtext.auto()
+
+ggplot(data = data2, mapping = aes(x = count, y = reorder(species.dk, +count)))+
+  geom_bar(stat = "identity",
+           fill = "#869EC2",
+           col = "#495B73")+
+  theme_minimal()+
+  theme(
+    text = element_text(family = "amatic-sc", face = "bold"),
+    axis.text = element_text(size = 15)
+  )+
+  xlab(" ")+
+  ylab(" ")
+
