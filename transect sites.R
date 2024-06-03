@@ -1,20 +1,9 @@
-library(lubridate)
-library(tidyverse)
-library("geodata")
-#library("sp")
 library("sf")
-library("rgdal")
-#library("ggrepel")
-library("raster")
-library("rgeos")
-#library(viridis)
-#library(readxl)
-install.packages("rgdal")
+library("terra")
+library(tidyverse)
 
-
-Dir.Base <- getwd()
-
-denmark <- gadm(country = "DNK", level = 1, path = file.path(Dir.Base, 'Data'))
+denmark <- readRDS(file= "DNK.rds")
+denmark <- unwrap(denmark)
 
 denmark.sf <- st_as_sf(denmark)
 
@@ -23,8 +12,6 @@ denmark.union <- st_union(denmark.sf)
 fau.dist <- st_read(dsn= "faunistiskedistrikter.kml") %>%
   mutate(point = st_centroid(geometry)) %>%
   mutate(names = c("WJ", "SJ","EJ","NEJ","NWJ","B","F","NWZ","NEZ","SZ","LFM"))
-
-coordinates(fau.dist$point)
 
 data.15min <- st_read(dsn = "ebms_15.min.kml")
 
@@ -70,7 +57,4 @@ ggplot()+
     axis.line = element_blank(),
     axis.ticks = element_blank(),
     legend.title = element_blank()
-  ) + 
-  theme(legend.position = c(0.83, 0.88))
-
-
+  )
