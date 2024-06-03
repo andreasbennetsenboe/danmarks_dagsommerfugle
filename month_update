@@ -25,7 +25,7 @@ mutate.dk <- function (x){
     species == "Plebejus idas" ~ "Foranderlig Blåfugl",
     species == "Pyrgus armoricanus" ~ "Fransk Bredpande",
     species == "Erynnis tages" ~ "Gråbåndet Bredpande",
-    species == "Maniola juthina" ~ "Græsrandøje",
+    species == "Maniola jurtina" ~ "Græsrandøje",
     species == "Callophrys rubi" ~ "Grøn Busksommerfugl",
     species == "Pontia edusa" ~ "Grønbroget Kålsommerfugl",
     species == "Pieris napi" ~ "Grønåret Kålsommerfugl",
@@ -112,45 +112,45 @@ data2 <- data %>%
 
 #showtext.auto()
 
-month_plot <- function(data, month) {
+month_plot <- function(input, month) {
   
-ggplot(data = data, mapping = aes(y = count, x = reorder(dk.species, +count)))+
-  geom_bar(stat = "identity",
-           fill = "#869EC2",
-           width = 0.6,
-           col = "#495B73"
-           )+
-  geom_text(aes(label = paste0(after_stat(y))),
-            hjust=-0.5,
-            position = position_dodge(width = 1),
-            size = 30,
-            family = "amatic-sc", 
-            fontface = "bold"
-  )+
-  coord_flip()+
-  theme_minimal(
+  ggplot(data = input, mapping = aes(y = count, x = reorder(species.dk, +count)))+
+    geom_bar(stat = "identity",
+             fill = "#869EC2",
+             width = 0.6,
+             col = "#495B73"
     )+
-  labs(x = "",
-       y = "",
-       title = paste0("Observationer i ", month),
-       subtitle = c(paste0("Antal observationer: ", sum(data2$count)), 
-                    paste0("Antal transektture: ", n_distinct(data$Transect.Sample.ID)))
-       )+
-  scale_y_continuous(limits = c(0,150))+
-  theme(
-    text = element_text(family = "amatic-sc", face = "bold"),
-    plot.title = element_text(size = 100,
-                              hjust = 0.5,
-                              margin=margin(15,0,25,0)),
-    plot.subtitle = element_text(hjust = c(0.8, 0.2),
-                                 size = 60),
-    axis.text.x = element_blank(),
-    axis.text.y = element_text(size = 80),
-    panel.grid = element_blank()
-  )
+    geom_text(aes(label = paste0(after_stat(y))),
+              hjust=-0.5,
+              position = position_dodge(width = 1),
+              size = 15,
+              family = "amatic-sc", 
+              fontface = "bold"
+    )+
+    coord_flip()+
+    theme_minimal(
+    )+
+    labs(x = "",
+         y = "",
+         title = paste0("Observationer i ", month),
+         subtitle = c(paste0("Antal observationer: ", sum(data2$count)), 
+                      paste0("Antal transektture: ", n_distinct(data$Transect.Sample.ID)))
+    )+
+    scale_y_continuous(limits = c(0,max(input$count)+20))+
+    theme(
+      text = element_text(family = "amatic-sc", face = "bold"),
+      plot.title = element_text(size = 100,
+                                hjust = 0.5,
+                                margin=margin(15,0,20,0)),
+      plot.subtitle = element_text(hjust = c(0.8, 0.2),
+                                   size = 60),
+      axis.text.x = element_blank(),
+      axis.text.y = element_text(size = 45),
+      panel.grid = element_blank()
+    )
+  
+} 
 
-}  
-
-month_plot(data = data2, month = "april")
+month_plot(input = data2, month = "april")
 
 ggsave("april.jpg")
