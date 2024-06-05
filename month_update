@@ -2,6 +2,19 @@ library(tidyverse)
 library(lubridate)
 library(showtext)
 
+dk.species <- c("Aglais io","Gonepteryx rhamni","Anthocharis cardamines","Pieris napi","Pieris rapae",
+                "Coenonympha pamphilus","Aglais urticae","Lycaena phlaeas","Celastrina argiolus",
+                "Polyommatus icarus","Aricia agestis","Pieris brassicae","Araschnia levana","Cupido minimus",
+                "Ochlodes sylvanus","Maniola jurtina","Melitaea cinxia","Boloria selene","Aporia crataegi",
+                "Melitaea athalia","Issoria lathonia","Lycaena hippothoe","Callophrys rubi","Vanessa atalanta",
+                "Fabriciana niobe","Cyaniris semiargus","Pararge aegeria","Thymelicus sylvestris",
+                "Thymelicus lineola","Satyrinae","Thymelicus","Vanessa cardui","Erynnis tages","Pyrgus malvae",
+                "Fabriciana adippe","Plebejus idas","Lycaena virgaureae","Favonius quercus","Satyrium w-album",
+                "Argynnis","Hesperiidae","Argynnis paphia","Thecla betulae","Nymphalis antiopa","Lasiommata megera",
+                "Sympetrum sanguineum","Colias hyale")
+
+dk.resttax <- c("Pieridae", "Lycaenidae")
+
 mutate.dk <- function (x){
   x %>% mutate(species.dk = case_when(
     species == "Vanessa atalanta" ~ "Admiral",
@@ -9,7 +22,7 @@ mutate.dk <- function (x){
     species == "Plebejus argus" ~ "Argusblåfugl",
     species == "Anthocharis cardamines" ~ "Aurora",
     species == "Favonius quercus" ~ "Blåhale",
-    species == "Melithaea athalia" ~ "Brun Pletvinge",
+    species == "Melitaea athalia" ~ "Brun Pletvinge",
     species == "Boloria selene" ~ "Brunlig Perlemorsommerfugl",
     species == "Agriades optilete" ~ "Bølleblåfugl",
     species == "Gonepteryx rhamni" ~ "Citronsommerfugl",
@@ -41,7 +54,7 @@ mutate.dk <- function (x){
     species == "Fabriciana niobe" ~ "Klitperlemorsommerfugl",
     species == "Hesperia comma" ~ "Kommabredpande",
     species == "Lycaena phlaeas" ~ "Lille Ildfugl",
-    species == "Pieris rapae" ~ "Lile Kålsommerfugl",
+    species == "Pieris rapae" ~ "Lille Kålsommerfugl",
     species == "Speyeria aglaja" ~ "Markperlemorsommerfugl",
     species == "Boloria aquilonaris" ~ "Moseperlemorsommerfugl",
     species == "Coenonympha tullia" ~ "Moserandøje",
@@ -80,37 +93,29 @@ mutate.dk <- function (x){
 
 data.raw <- read.csv(file = "occurences.csv")
 
-species.inspect <- data.raw %>%
-  filter(Preferred.Species.Name == "Erynnis tages")
+#species.inspect <- data.raw %>%
+#  filter(Preferred.Species.Name == "Erynnis tages")
 
-data <- data.raw %>%
+data1 <- data.raw %>%
   dplyr::select(1:3, count = Abundance.Count, date = "Date", species = "Preferred.Species.Name")%>%
-  filter(species %in% c("Aglais io","Gonepteryx rhamni","Anthocharis cardamines","Pieris napi","Pieris rapae",
-                        "Coenonympha pamphilus","Aglais urticae","Lycaena phlaeas","Celastrina argiolus",
-                        "Polyommatus icarus","Aricia agestis","Pieris brassicae","Araschnia levana","Cupido minimus",
-                        "Ochlodes sylvanus","Maniola jurtina","Melitaea cinxia","Boloria selene","Aporia crataegi",
-                        "Melitaea athalia","Issoria lathonia","Lycaena hippothoe","Callophrys rubi","Vanessa atalanta",
-                        "Fabriciana niobe","Cyaniris semiargus","Pararge aegeria","Thymelicus sylvestris",
-                        "Thymelicus lineola","Satyrinae","Thymelicus","Vanessa cardui","Erynnis tages","Pyrgus malvae",
-                        "Fabriciana adippe","Plebejus idas","Lycaena virgaureae","Favonius quercus","Satyrium w-album",
-                        "Argynnis","Hesperiidae","Argynnis paphia","Thecla betulae","Nymphalis antiopa","Lasiommata megera",
-                        "Sympetrum sanguineum","Colias hyale","Lycaenidae"
-                        )) %>%
+  filter(species %in% dk.species) %>%
   mutate(date = dmy(date)) %>%
   mutate(year = year(date),
          month = month(date),
          day = day(date)) %>%
-  filter(year == 2024 & month == 5) %>%
+  filter(year == 2024) %>%
   mutate.dk()
 
-data2 <- data %>%
+
+data2 <- data1 %>%
   group_by(species.dk) %>%
   summarise(count = sum(count)) %>%
   arrange(desc(count))
 
-#font_add_google(name = "Amatic SC", family = "amatic-sc")
+font_add_google(name = "Amatic SC", family = "amatic-sc")
 
-#showtext.auto()
+showtext.auto()
+
 
 month_plot <- function(input, month) {
   
@@ -134,7 +139,7 @@ month_plot <- function(input, month) {
          y = "",
          title = paste0("Observationer i ", month),
          subtitle = c(paste0("Antal observationer: ", sum(data2$count)), 
-                      paste0("Antal transektture: ", n_distinct(data$Transect.Sample.ID)))
+                      paste0("Antal transektture: ", n_distinct(data1$Transect.Sample.ID)))
     )+
     scale_y_continuous(limits = c(0,max(input$count)+20))+
     theme(
@@ -149,8 +154,51 @@ month_plot <- function(input, month) {
       panel.grid = element_blank()
     )
   
-} 
+}
 
-month_plot(input = data2, month = "april")
+year_plot <- function(input, year) {
+  
+  ggplot(data = input, mapping = aes(y = count, x = reorder(species.dk, +count)))+
+    geom_bar(stat = "identity",
+             fill = "#869EC2",
+             width = 0.6,
+             col = "#495B73"
+    )+
+    geom_text(aes(label = paste0(after_stat(y))),
+              hjust=-0.5,
+              position = position_dodge(width = 1),
+              size = 15,
+              family = "amatic-sc", 
+              fontface = "bold"
+    )+
+    coord_flip()+
+    theme_minimal(
+    )+
+    labs(x = "",
+         y = "",
+         title = paste0("Observationer i ", year),
+         subtitle = c(paste0("Antal observationer: ", sum(data2$count)), 
+                      paste0("Antal transektture: ", n_distinct(data1$Transect.Sample.ID)))
+    )+
+    scale_y_continuous(limits = c(0,max(input$count)+20))+
+    theme(
+      text = element_text(family = "amatic-sc", face = "bold"),
+      plot.title = element_text(size = 100,
+                                hjust = 0.5,
+                                margin=margin(15,0,20,0)),
+      plot.subtitle = element_text(hjust = c(0.8, 0.2),
+                                   size = 60),
+      axis.text.x = element_blank(),
+      axis.text.y = element_text(size = 45),
+      panel.grid = element_blank()
+    )
+  
+}  
 
-ggsave("april.jpg")
+month_plot(input = data2, month = "maj")
+plot2024 <- year_plot(input = data2, year = 2024)
+
+ggsave(filename = "maj.jpg",
+       plot = plot2024,
+       width = 10,
+       height = 7)
