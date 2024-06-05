@@ -4,6 +4,17 @@ library(tidyverse)
 library(showtext)
 library(viridis)
 
+dk.species <- c("Aglais io","Gonepteryx rhamni","Anthocharis cardamines","Pieris napi","Pieris rapae",
+                "Coenonympha pamphilus","Aglais urticae","Lycaena phlaeas","Celastrina argiolus",
+                "Polyommatus icarus","Aricia agestis","Pieris brassicae","Araschnia levana","Cupido minimus",
+                "Ochlodes sylvanus","Maniola jurtina","Melitaea cinxia","Boloria selene","Aporia crataegi",
+                "Melitaea athalia","Issoria lathonia","Lycaena hippothoe","Callophrys rubi","Vanessa atalanta",
+                "Fabriciana niobe","Cyaniris semiargus","Pararge aegeria","Thymelicus sylvestris",
+                "Thymelicus lineola","Satyrinae","Thymelicus","Vanessa cardui","Erynnis tages","Pyrgus malvae",
+                "Fabriciana adippe","Plebejus idas","Lycaena virgaureae","Favonius quercus","Satyrium w-album",
+                "Argynnis","Hesperiidae","Argynnis paphia","Thecla betulae","Nymphalis antiopa","Lasiommata megera",
+                "Sympetrum sanguineum","Colias hyale")
+
 denmark <- readRDS(file= "DNK.rds")
 denmark <- unwrap(denmark)
 
@@ -15,7 +26,7 @@ fau.dist <- st_read(dsn= "faunistiskedistrikter.kml") %>%
   mutate(point = st_centroid(geometry)) %>%
   mutate(names = c("WJ", "SJ","EJ","NEJ","NWJ","B","F","NWZ","NEZ","SZ","LFM"))
 
-data.15min <- st_read(dsn = "ebms_15.min.kml")
+#data.15min <- st_read(dsn = "ebms_15.min.kml")
 
 site.data <- read.csv("ebms_sites.csv") %>%
   dplyr::select(Spatial.Reference, Transect.ID, length = "Overall.Length..m.") %>%
@@ -30,6 +41,8 @@ sites <- site.data %>%
   mutate(E = gsub("[[:alpha:]]", "", E)) %>%
   mutate(N = as.numeric(N),
          E = as.numeric(E))
+
+data.raw <- read.csv(file = "occurences.csv")
 
 data1 <- data.raw %>%
   dplyr::select(1:3, count = Abundance.Count, date = "Date", species = "Preferred.Species.Name")%>%
@@ -46,17 +59,70 @@ data2 <- data1 %>%
   full_join(y = sites, by = "Transect.ID") %>%
   drop_na()
 
-ggplot(data.15min) +
-  geom_sf() +
-  stat_sf_coordinates()
+data2023 <- data1 %>%
+  filter(year == 2023) %>%
+  group_by(Transect.ID) %>%
+  summarize(count=n_distinct(Transect.Sample.ID)) %>%
+  full_join(y = sites, by = "Transect.ID") %>%
+  drop_na()
+
+#ggplot(data.15min) +
+#  geom_sf() +
+#  stat_sf_coordinates()
 
 font_add_google(name = "Amatic SC", family = "amatic-sc")
 
-showtext.auto()
+showtext_auto()
 
-ggplot()+
-  geom_sf(data =  denmark.union, fill = "#f5f5f5", col = "#757575", lwd = 0.2, alpha=0.8)+
-  geom_sf(data =  fau.dist, fill = NA, col = "snow4", lwd = 0.2, alpha=0.8)+
+localities.map <- ggplot()+
+  geom_sf(data =  denmark.union, 
+          fill = "#f5f5f5", 
+          col = "snow3", 
+          lwd = 0.5
+          )+
+  geom_sf(data =  fau.dist, 
+          fill = NA, 
+          col = "snow4", 
+          lwd = 0.5)+
+  geom_sf_text(data = fau.dist, 
+               aes(label = names), 
+               color = "black",
+               family = "amatic-sc", 
+               fontface = "bold",
+               size = 20,
+               fun.geometry = st_centroid)+
+  geom_point(data = data2023,
+             mapping = aes(x = E, y= N),
+             size = 1.5,
+             col = "#63769E"
+  )+
+  theme_classic() +
+  labs(x = "", y="")+
+  #ggtitle("")+
+  theme(
+    axis.text = element_blank(),
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    plot.title = element_text(size = 100,
+                              hjust = 0.5),
+    legend.title = element_blank(),
+    text = element_text(size = 60,
+                        family = "amatic-sc", 
+                        face = "bold")
+  )
+localities.map
+
+effort.map <- ggplot()+
+  geom_sf(data =  denmark.union, 
+          fill = "#f5f5f5", 
+          col = "snow3", 
+          lwd = 0.2, 
+          alpha=1)+
+  geom_sf(data =  fau.dist, 
+          fill = NA, 
+          col = "snow4", 
+          lwd = 0.2, 
+          alpha=1)+
   geom_sf_text(data = fau.dist, 
                aes(label = names), 
                color = "black",
@@ -66,7 +132,7 @@ ggplot()+
                fun.geometry = st_centroid)+
   geom_point(data = data2,
              mapping = aes(x = E, y= N, fill = count),
-             size = 2,
+             size = 3,
              shape = 21
              )+
   scale_fill_viridis(
@@ -83,12 +149,13 @@ ggplot()+
                               hjust = 0.5),
     legend.title = element_blank(),
     text = element_text(size = 60,
-                               family = "amatic-sc", 
-                               face = "bold")
+                        family = "amatic-sc", 
+                        face = "bold")
   )
-  
+effort.map
 
-ggsave("maj_kort.jpg")
+ggsave(filename = "maj_kort.jpg",
+       plot = localities.map)
 
 #geom_point(aes(col = "red"))+
 #geom_sf(data = data.15min, 
