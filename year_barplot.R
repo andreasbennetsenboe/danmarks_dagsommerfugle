@@ -46,15 +46,17 @@ transect.data1 <- transect.data.raw %>%
   left_join(y = read.csv(file = "data/dk.family.names.txt"), by = "species") %>%
   left_join(y = read.csv(file = "data/dk.alttax.names.txt"), by = "species") %>%
   redlist.join()%>%
-  filter(!is.na(count))
-
-transect.data.year <- transect.data1 %>%
-  filter(year <= 2024)
-
-transect.data2 <- transect.data.year %>%
+  filter(!is.na(count)) %>%
+  filter(year <= 2024) %>%
   group_by(species.dk) %>%
   summarise(count = sum(count)) %>%
-  arrange(desc(count)) %>%
+  arrange(desc(count))
+
+text.data <- transect.data1 %>%
+  filter(count <= 100) %>%
+  unite(col = data, species.dk, count, sep = " ")
+
+figure.data <- transect.data1 %>%
   filter(count >= 100)
 
 font_add_google(name = "Amatic SC", family = "amatic-sc")
@@ -72,7 +74,7 @@ year_plot <- function(input, year) {
     geom_text(aes(label = paste0(after_stat(y))),
               hjust=-0.5,
               position = position_dodge(width = 1),
-              size = 9,
+              size = 13,
               family = "amatic-sc", 
               fontface = "bold"
     )+
@@ -94,17 +96,20 @@ year_plot <- function(input, year) {
       plot.subtitle = element_text(hjust = c(0.8, 0.2),
                                    size = 50),
       axis.text.x = element_blank(),
-      axis.text.y = element_text(size = 30),
+      axis.text.y = element_text(size = 40),
       panel.grid = element_blank()
     )
   
 }
 
-speciesplot.2024 <- year_plot(input = transect.data2, year = "2024")
+speciesplot.2024 <- year_plot(input = figure.data, year = "2024")
 
 speciesplot.2024
+
+writeLines(text = text.data$data, con = "output/species.totals.under.100.txt", sep = ", ")
 
 ggsave(filename = "output/speciesplot.2024.jpg",
        plot = speciesplot.2024,
        width = 10,
        height = 7)
+
