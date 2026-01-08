@@ -2,26 +2,11 @@ library("tidyverse")
 library("lubridate")
 library(showtext)
 
+sampling.year <- 2025
 
-transect.data.raw <- read.csv(file = "data/download.species.occurences.from.transects.csv")
+font_add_google(name = "Amatic SC", family = "amatic-sc")
 
-transect.data <- read.csv(file = "data/download.species.occurences.from.transects.csv")%>%
-  mutate(Date = dmy(Date))%>%
-  mutate(Year = year(Date)) %>%
-  filter(Record.status == "Accepted")
-
-site.data <- read.csv("data/download.site.details.csv") %>%
-  dplyr::select(Spatial.Reference, Transect.ID, Transect.Name, length = "Overall.Length..m.") %>%
-  drop_na() %>%
-  filter(length > 100)%>%
-  separate(col = Spatial.Reference, into = c("N", "E"), sep = " ") %>%
-  mutate(N = gsub(",$", "", N)) %>%
-  mutate(N = gsub("[[:alpha:]]", "", N))%>%
-  mutate(E = gsub("[[:alpha:]]", "", E)) %>%
-  mutate(N = as.numeric(N),
-         E = as.numeric(E))
-
-####---- Data import and wrangling ----####
+showtext_auto()
 
 redlist.join <- function (x){
   x %>% left_join(
@@ -33,35 +18,24 @@ redlist.join <- function (x){
   )
 }
 
-transect.data1 <- transect.data.raw %>%
-  filter(Transect.Name %in% site.data$Transect.Name) %>%
-  dplyr::select(1:3, Transect.Name, count = Abundance.Count, date = "Date", species = "Preferred.Species.Name") %>%
-  filter(species %in% read_lines(file = "data/butterfly.species.txt")) %>%
-  mutate(date = dmy(date)) %>%
-  mutate(year = year(date),
-         month = month(date),
-         day = day(date)) %>%
-  mutate(DOY = yday(date)) %>%
-  left_join(y = read.csv(file = "data/dk.species.names.txt"), by = "species")%>%
-  left_join(y = read.csv(file = "data/dk.family.names.txt"), by = "species") %>%
-  left_join(y = read.csv(file = "data/dk.alttax.names.txt"), by = "species") %>%
-  redlist.join()%>%
-  filter(!is.na(count)) %>%
-  filter(year <= 2024) %>%
-  group_by(species.dk) %>%
-  summarise(count = sum(count)) %>%
-  arrange(desc(count))
+transect.data.raw <- read.csv(file = "data/download.species.occurences.from.transects.csv")
 
-text.data <- transect.data1 %>%
-  filter(count <= 100) %>%
-  unite(col = data, species.dk, count, sep = " ")
+raw.15min.obs <- read.csv(file = "data/download.timed.count.occurences.csv") %>%
+  select(date = "Date", count = "Count", species = "Accepted.species.name")
 
-figure.data <- transect.data1 %>%
-  filter(count >= 100)
+raw.15min.obs.ss <- read.csv(file = "data/download.single-species-timed-count.occurences.csv") %>%
+  select(date = "Date", count = "Count", species = "Searched.for.species...accepted.name")
 
-font_add_google(name = "Amatic SC", family = "amatic-sc")
-
-showtext_auto()
+site.data <- read.csv("data/download.site.details.csv") %>%
+  dplyr::select(Spatial.Reference, Transect.ID, Transect.Name, length = "Overall.Length..m.") %>%
+  drop_na() %>%
+  filter(length > 100)%>%
+  separate(col = Spatial.Reference, into = c("N", "E"), sep = " ") %>%
+  mutate(N = gsub(",$", "", N)) %>%
+  mutate(N = gsub("[[:alpha:]]", "", N))%>%
+  mutate(E = gsub("[[:alpha:]]", "", E)) %>%
+  mutate(N = as.numeric(N),
+         E = as.numeric(E))
 
 year_plot <- function(input, year) {
   
@@ -102,14 +76,109 @@ year_plot <- function(input, year) {
   
 }
 
-speciesplot.2024 <- year_plot(input = figure.data, year = "2024")
+####---- Tidy transect data ----####
 
-speciesplot.2024
+transect.data1 <- transect.data.raw %>%
+  filter(Record.status == "Accepted") %>%
+  filter(Transect.Name %in% site.data$Transect.Name) %>%
+  dplyr::select(count = Abundance.Count, date = "Date", species = "Preferred.Species.Name") %>%
+  filter(species %in% read_lines(file = "data/butterfly.species.txt")) %>%
+  mutate(date = dmy(date)) %>%
+  mutate(year = year(date)) %>%
+  left_join(y = read.csv(file = "data/dk.species.names.txt"), by = "species")%>%
+  filter(!is.na(count)) %>%
+  filter(year == sampling.year) %>%
+  group_by(species.dk) %>%
+  summarise(count = sum(count)) %>%
+  arrange(desc(count))
 
-writeLines(text = text.data$data, con = "output/species.totals.under.100.txt", sep = ", ")
+transect.text.data <- transect.data1 %>%
+  filter(count < 100) %>%
+  unite(col = data, species.dk, count, sep = " ")
 
-ggsave(filename = "output/speciesplot.2024.jpg",
-       plot = speciesplot.2024,
+transect.figure.data <- transect.data1 %>%
+  filter(count >= 100)
+
+transect.speciesplot <- year_plot(input = transect.figure.data, year = sampling.year)
+
+transect.speciesplot
+
+writeLines(text = transect.text.data$data, con = paste0("output/year_barplot/totals.under.100.transect.", sampling.year, ".txt"), sep = ", ")
+
+ggsave(filename = paste0("output/year_barplot/speciesplot.transect.", sampling.year, ".jpg"),
+       plot = transect.speciesplot,
        width = 10,
        height = 7)
 
+####---- Tidy 15 min data ----####
+
+data.15.min <- raw.15min.obs %>%
+  filter(species %in% read_lines(file = "data/butterfly.species.txt")) %>%
+  mutate(date = dmy(date)) %>%
+  mutate(year = year(date)) %>%
+  left_join(y = read.csv(file = "data/dk.species.names.txt"), by = "species")%>%
+  filter(!is.na(count)) %>%
+  filter(year == sampling.year) %>%
+  group_by(species.dk) %>%
+  summarise(count = sum(count)) %>%
+  arrange(desc(count))
+
+text.data.15min <- data.15.min %>%
+  filter(count < 100) %>%
+  unite(col = data, species.dk, count, sep = " ")
+
+figure.data.15min <- data.15.min %>%
+  filter(count >= 100)
+
+speciesplot.15min <- year_plot(input = figure.data.15min, year = sampling.year)
+
+speciesplot.15min
+
+writeLines(text = text.data.15min$data, paste0(con = "output/year_barplot/totals.under.100.15min.", sampling.year, ".txt"), sep = ", ")
+
+ggsave(filename = paste0("output/year_barplot/speciesplot.15min.", sampling.year, ".jpg"),
+       plot = speciesplot.15min,
+       width = 10,
+       height = 7)
+
+####---- Tidy all data ----####
+
+all.data1 <- transect.data.raw %>%
+  filter(Record.status == "Accepted") %>%
+  filter(Transect.Name %in% site.data$Transect.Name) %>%
+  dplyr::select(count = Abundance.Count, date = "Date", species = "Preferred.Species.Name") %>%
+  bind_rows(raw.15min.obs, raw.15min.obs.ss) %>%
+  filter(species %in% read_lines(file = "data/butterfly.species.txt")) %>%
+  mutate(date = dmy(date)) %>%
+  mutate(year = year(date)) %>%
+  left_join(y = read.csv(file = "data/dk.species.names.txt"), by = "species")%>%
+  filter(!is.na(count)) %>%
+  filter(year == sampling.year) %>%
+  group_by(species.dk) %>%
+  summarise(count = sum(count)) %>%
+  arrange(desc(count))
+
+all.text.data <- all.data1 %>%
+  filter(count < 100) %>%
+  unite(col = data, species.dk, count, sep = " ")
+
+all.figure.data <- all.data1 %>%
+  filter(count >= 100)
+
+all.speciesplot <- year_plot(input = all.figure.data, year = sampling.year)
+
+all.speciesplot
+
+writeLines(
+  text = all.text.data$data,
+  con = paste0("output/year_barplot/alldata.totals.under.100.", sampling.year, ".txt"),
+  sep = ", "
+  )
+
+ggsave(
+  filename = paste0("output/year_barplot/alldata.speciesplot.", sampling.year, ".jpg"),
+  plot = all.speciesplot,
+  width = 10,
+  height = 7
+  )
+                     
