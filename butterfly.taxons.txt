@@ -1,0 +1,83 @@
+Lycaena phlaeas
+Lycaena virgaureae
+Lycaena hippothoe
+Celastrina argiolus
+Cupido minimus
+Cyaniris semiargus
+Plebejus argus
+Plebejus idas
+Agriades optilete
+Polyommatus icarus
+Polyommatus amandus
+Aricia agestis
+Aricia artaxerxes
+Phengaris alcon
+Phengaris arion
+Favonius quercus
+Satyrium w-album
+Callophrys rubi
+Thecla betulae
+Maniola jurtina
+Coenonympha pamphilus
+Coenonympha tullia
+Aphantopus hyperantus
+Pararge aegeria
+Lasiommata megera
+Hipparchia semele
+Vanessa atalanta
+Vanessa cardui
+Aglais io
+Aglais urticae
+Polygonia c-album
+Nymphalis antiopa
+Nymphalis xanthomelas
+Nymphalis polychloros
+Limenitis camilla
+Araschnia levana
+Apatura iris
+Apatura ilia
+Melitaea cinxia
+Melitaea athalia
+Melitaea diamina
+Euphydryas aurinia
+Boloria selene
+Boloria aquilonaris
+Boloria euphrosyne
+Issoria lathonia
+Brenthis ino
+Fabriciana niobe
+Fabriciana adippe
+Argynnis paphia
+Speyeria aglaja
+Colias hyale
+Colias crocea
+Gonepteryx rhamni
+Anthocharis cardamines
+Pieris napi
+Pieris rapae
+Pieris brassicae
+Aporia crataegi
+Pontia edusa
+Ochlodes sylvanus
+Thymelicus sylvestris
+Thymelicus lineola
+Erynnis tages
+Pyrgus malvae
+Pyrgus armoricanus
+Hesperia comma
+Carterocephalus silvicola
+Heteropterus morpheus
+Lycaenidae
+Lycaeninae
+Lycaena
+Polyommatinae
+Pieridae
+Pieris
+Hesperiinae
+Thymelicus
+Satyrinae
+Fabriciana
+Lasiommata
+Argynnis
+Plebejus
+Polyommatus

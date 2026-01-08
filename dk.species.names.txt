@@ -1,0 +1,70 @@
+species,species.dk
+Lycaena phlaeas,Lille Ildfugl
+Lycaena virgaureae,Dukatsommerfugl
+Lycaena hippothoe,Violetrandet Ildfugl
+Celastrina argiolus,Skovblåfugl
+Cupido minimus,Dværgblåfugl
+Cyaniris semiargus,Engblåfugl
+Plebejus argus,Argusblåfugl
+Plebejus idas,Foranderlig Blåfugl
+Agriades optilete,Bølleblåfugl
+Polyommatus icarus,Alm. Blåfugl
+Polyommatus amandus,Isblåfugl
+Aricia agestis,Rødplettet Blåfugl
+Aricia artaxerxes,Sortbrun Blåfugl
+Phengaris alcon,Ensianblåfugl
+Phengaris arion,Sortplettet Blåfugl
+Favonius quercus,Blåhale
+Satyrium w-album,Det Hvide W
+Callophrys rubi,Grøn Busksommerfugl
+Thecla betulae,Guldhale
+Maniola jurtina,Græsrandøje
+Coenonympha pamphilus,Okkergul Randøje
+Coenonympha tullia,Moserandøje
+Aphantopus hyperantus,Engrandøje
+Pararge aegeria,Skovrandøje
+Lasiommata megera,Vejrandøje
+Hipparchia semele,Sandrandøje
+Vanessa atalanta,Admiral
+Vanessa cardui,Tidselsommerfugl
+Aglais io,Dagpåfugleøje
+Aglais urticae,Nældens Takvinge
+Polygonia c-album,Det Hvide C
+Nymphalis antiopa,Sørgekåbe
+Nymphalis xanthomelas,Østlig Takvinge
+Nymphalis polychloros,Kirsebærtakvinge
+Limenitis camilla,Hvid Admiral
+Araschnia levana,Nældesommerfugl
+Apatura iris,Iris
+Apatura ilia,Ilia
+Melitaea cinxia,Okkergul Pletvinge
+Melitaea athalia,Brun Pletvinge
+Melitaea diamina,Mørk Pletvinge
+Euphydryas aurinia,Hedepletvinge
+Boloria selene,Brunlig Perlemorsommerfugl
+Boloria aquilonaris,Moseperlemorsommerfugl
+Boloria euphrosyne,Rødlig Perlemorsommerfugl
+Issoria lathonia,Storplettet Perlemorsommerfugl
+Brenthis ino,Engperlemorsommerfugl
+Fabriciana niobe,Klitperlemorsommerfugl
+Fabriciana adippe,Skovperlemorsommerfugl
+Argynnis paphia,Kejserkåbe
+Speyeria aglaja,Markperlemorsommerfugl
+Colias hyale,Gul Høsommerfugl
+Colias crocea,Orange Høsommerfugl
+Gonepteryx rhamni,Citronsommerfugl
+Anthocharis cardamines,Aurora
+Pieris napi,Grønåret Kålsommerfugl
+Pieris rapae,Lille Kålsommerfugl
+Pieris brassicae,Stor Kålsommerfugl
+Aporia crataegi,Sortåret Hvidvinge
+Pontia edusa,Grønbroget Kålsommerfugl
+Ochlodes sylvanus,Stor Bredpande
+Thymelicus sylvestris,Skråstregbredpande
+Thymelicus lineola,Stregbredpande
+Erynnis tages,Gråbåndet Bredpande
+Pyrgus malvae,Spættet Bredpande
+Pyrgus armoricanus,Fransk Bredpande
+Hesperia comma,Kommabredpande
+Carterocephalus silvicola,Sortplettet Bredpande
+Heteropterus morpheus,Spejlbredpande
