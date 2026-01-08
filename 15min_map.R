@@ -24,9 +24,9 @@ fau.dist <- st_read(dsn= "faunistiskedistrikter.kml") %>%
   mutate(point = st_centroid(geometry)) %>%
   mutate(names = c("WJ", "SJ","EJ","NEJ","NWJ","B","F","NWZ","NEZ","SZ","LFM"))
 
-raw.15min.samples <- read.csv(file = "data/download.timed-count.sample.data.csv")
+raw.15min.samples <- read.csv(file = "data/download.timed.count.sample.data.csv")
 
-raw.15min.obs <- read.csv(file = "data/download.timed-count.occurences.csv")
+raw.15min.obs <- read.csv(file = "data/download.timed.count.occurences.csv")
 
 raw.15min.obs.ss <- read.csv(file = "data/download.single-species-timed-count.occurences.csv")
 
@@ -35,7 +35,12 @@ raw.15min.samples$Geom <- st_as_sfc(raw.15min.samples$Geom, crs = 4326)
 raw.15min.samples <- st_as_sf(raw.15min.samples)
 
 centroids <- raw.15min.samples %>%
-  st_centroid()
+  st_centroid() %>%
+  mutate(
+    date = dmy(Date),
+    year = year(date)
+         ) %>%
+  filter(year == 2025)
 
 map <- ggplot()+
   geom_sf(data =  denmark.union, 
@@ -53,7 +58,7 @@ map <- ggplot()+
                color = "black",
                family = "amatic-sc", 
                fontface = "bold",
-               size = 20,
+               size = 10,
                fun.geometry = st_centroid)+
   geom_sf(data = centroids,
              fill = "#5F7394", #fill = visits),
@@ -81,7 +86,7 @@ map <- ggplot()+
   )
 
 
-ggsave(filename = "output/15min.map.jpg",
+ggsave(filename = "output/15min.map.2025.jpg",
        plot = map,
        width = 8,
        height = 6)
